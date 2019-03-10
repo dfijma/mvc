@@ -4,7 +4,7 @@ stty_save=$(stty -g)
 tput civis
 stty -echo
 stty cbreak
-java -cp ./target/mvc-1.0-SNAPSHOT.jar net.fijma.mvc.example.Main "$@"
+java -jar ./target/mvc-1.1-SNAPSHOT-jar-with-dependencies.jar "$@"
 stty $stty_save
 tput cnorm
-clear
+# clear

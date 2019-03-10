@@ -1,11 +1,10 @@
 package net.fijma.mvc.example;
 
 import net.fijma.mvc.Event;
-import net.fijma.mvc.Model;
 
 import java.util.logging.Logger;
 
-public class AppModel extends Model {
+public class AppModel {
 
     private Logger log = Logger.getGlobal();
 

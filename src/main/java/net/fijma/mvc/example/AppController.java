@@ -1,39 +1,38 @@
 package net.fijma.mvc.example;
 
-import net.fijma.mvc.AbstractController;
-import net.fijma.mvc.AbstractView;
-import net.fijma.mvc.Event;
+import net.fijma.mvc.Application;
+import net.fijma.mvc.Controller;
+import net.fijma.mvc.Msg;
+import net.fijma.mvc.serial.Serial;
 
-public class AppController extends AbstractController<AppModel> {
+public class AppController extends Controller<App, AppModel, MainView> {
 
-    private AppController(AppModel model, AbstractView view, Event<Integer> key) {
-        super(model, view, key);
+    AppController(App application, AppModel model, MainView mainView) {
+        super(application, model, mainView);
+
+        // wire model -> views
+        model.onSomethingChanged.attach(mainView::somethingChanged);
+
+        // wire views -> controller
+        mainView.down.attach(this::onDownEvent);
+        mainView.up.attach(this::onUpEvent);
     }
 
     private void onUpEvent(Void v) {
-        model().inc();
+        model.inc();
     }
 
     private void onDownEvent(Void v) {
-        model().dec();
+        model.dec();
     }
 
-    public static AppController setup(AppModel model, Event<Integer> key) {
-
-        // create views
-        MainView view = new MainView(model);
-
-        // wire model -> views
-        model.onSomethingChanged.attach(view::somethingChanged);
-
-        // create controller
-        AppController controller = new AppController(model, view, key);
-
-        // wire views -> controller
-        view.down.attach(controller::onDownEvent);
-        view.up.attach(controller::onUpEvent);
-
-        return controller;
+    protected boolean onEvent(Msg msg) {
+        if (msg instanceof Application.KeyMsg) {
+            return mainView.key(((Application.KeyMsg)msg).key);
+        } else if (msg instanceof Serial.SerialMsg) {
+            return true; // ignore
+        }
+        return true; // catch-all, ignore and continue
     }
 
 }

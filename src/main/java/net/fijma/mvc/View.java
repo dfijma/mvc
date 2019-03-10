@@ -1,13 +1,13 @@
 package net.fijma.mvc;
 
-public abstract class AbstractView  {
+public abstract class View<M> {
 
-    final Model model;
+    protected final M model;
 
     public abstract void draw();
     public abstract boolean key(int k);
 
-    protected AbstractView(Model model) {
+    protected View(M model) {
         this.model = model;
     }
 

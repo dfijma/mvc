@@ -1,6 +1,6 @@
 package net.fijma.mvc.example;
 
-import net.fijma.mvc.AbstractView;
+import net.fijma.mvc.View;
 import net.fijma.mvc.Event;
 
 import java.io.IOException;
@@ -10,7 +10,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class MainView extends AbstractView {
+public class MainView extends View<AppModel> {
 
     Logger log = Logger.getGlobal();
 
@@ -22,6 +22,7 @@ public class MainView extends AbstractView {
     }
 
     void somethingChanged(int i) {
+        assert (model.value == i); // we do have access to the model
         setRC(10,10);
         System.out.print((i < 0 ? red() : green()) + String.format("%10s", i));
     }
@@ -43,6 +44,7 @@ public class MainView extends AbstractView {
         switch (k) {
             case 88: // X, quit
             case 120:
+                reset();
                 return false;
             case 77: // M
             case 109:
