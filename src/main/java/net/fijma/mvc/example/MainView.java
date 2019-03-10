@@ -1,4 +1,7 @@
-package net.fijma.mvc.application;
+package net.fijma.mvc.example;
+
+import net.fijma.mvc.AbstractView;
+import net.fijma.mvc.Event;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -14,7 +17,7 @@ public class MainView extends AbstractView {
     final Event<Void> up = new Event<>();
     final Event<Void> down = new Event<>();
 
-    MainView(Model model) {
+    MainView(AppModel model) {
         super(model);
     }
 

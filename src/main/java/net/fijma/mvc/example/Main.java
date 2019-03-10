@@ -1,8 +1,7 @@
-package net.fijma.mvc;
+package net.fijma.mvc.example;
 
-import net.fijma.mvc.application.Controller;
-import net.fijma.mvc.application.Event;
-import net.fijma.mvc.application.Model;
+import net.fijma.mvc.AbstractController;
+import net.fijma.mvc.Event;
 
 import java.io.Console;
 import java.io.IOException;
@@ -36,10 +35,10 @@ public class Main {
 
     public void run() {
         // setup model
-        Model model = new Model();
+        AppModel model = new AppModel();
 
         // Setup controller and view
-        Controller controller = Controller.setup(model, keyAvailable);
+        AbstractController controller = AppController.setup(model, keyAvailable);
 
         // start reading the keyboard
         Thread kb = new Thread(this::keyboardLoop);

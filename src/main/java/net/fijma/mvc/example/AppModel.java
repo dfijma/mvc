@@ -1,8 +1,11 @@
-package net.fijma.mvc.application;
+package net.fijma.mvc.example;
+
+import net.fijma.mvc.Event;
+import net.fijma.mvc.Model;
 
 import java.util.logging.Logger;
 
-public class Model {
+public class AppModel extends Model {
 
     private Logger log = Logger.getGlobal();
 
@@ -14,7 +17,6 @@ public class Model {
         value++;
         log.info(() -> String.format("inc: value is now: %d", value));
         onSomethingChanged.trigger(value);
-
     }
 
     public void dec() {

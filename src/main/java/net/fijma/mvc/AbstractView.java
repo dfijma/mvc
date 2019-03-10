@@ -1,4 +1,4 @@
-package net.fijma.mvc.application;
+package net.fijma.mvc;
 
 public abstract class AbstractView  {
 
@@ -7,12 +7,11 @@ public abstract class AbstractView  {
     public abstract void draw();
     public abstract boolean key(int k);
 
-    AbstractView(Model model) {
+    protected AbstractView(Model model) {
         this.model = model;
     }
 
     // http://www.lihaoyi.com/post/BuildyourownCommandLinewithANSIescapecodes.html
-
     protected void clear() {
         System.out.print("\u001b[2J");
         setRC(0,0);

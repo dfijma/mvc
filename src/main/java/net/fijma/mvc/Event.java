@@ -1,4 +1,4 @@
-package net.fijma.mvc.application;
+package net.fijma.mvc;
 
 import java.util.ArrayList;
 import java.util.List;
