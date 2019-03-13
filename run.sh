@@ -7,4 +7,4 @@ stty cbreak
 java -jar ./target/mvc-1.1-SNAPSHOT-jar-with-dependencies.jar "$@"
 stty $stty_save
 tput cnorm
-# clear
+clear

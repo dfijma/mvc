@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 
 public class Serial implements ApplicationModule, SerialWriter, SerialPortDataListener {
 
-    private static Logger log = Logger.getGlobal();
+    private static final Logger LOGGER = Logger.getLogger(Serial.class.getName());
 
     private final String device;
     private final Application application;
@@ -39,7 +39,7 @@ public class Serial implements ApplicationModule, SerialWriter, SerialPortDataLi
     @Override
     public void start() throws IOException {
 
-        log.info("starting serial");
+        LOGGER.info("starting serial");
         // TODO: remove hardcoded stuff
         int baudRate = 57600; // 115200; //
 
@@ -52,7 +52,7 @@ public class Serial implements ApplicationModule, SerialWriter, SerialPortDataLi
 
     @Override
     public void stop() {
-        log.info("waiting for serial to stop");
+        LOGGER.info("waiting for serial to stop");
         if (serial != null) serial.closePort();
     }
 

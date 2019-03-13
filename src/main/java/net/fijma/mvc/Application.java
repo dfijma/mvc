@@ -6,14 +6,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
+import java.util.logging.*;
 
 public abstract class Application {
 
-    private static final Logger log = Logger.getGlobal();
+    private static final Logger LOGGER = Logger.getLogger(Application.class.getName());
 
     private final Map<Class<?>, ApplicationModule> modules = new HashMap<>();
 
@@ -21,41 +18,42 @@ public abstract class Application {
     private Queue<Msg> msgQueue = new ConcurrentLinkedQueue<>();
 
     protected Application() {
+        configureLogger();
     }
 
     protected void registerModule(ApplicationModule m) {
         modules.put(m.getClass(), m);
     }
 
-    protected <T extends ApplicationModule> T getModule(Class<T> key) {
+    public <T extends ApplicationModule> T getModule(Class<T> key) {
         return key.cast(modules.get(key));
     }
 
-    private void configureLogger() throws IOException {
+    private void configureLogger() {
         // get the global logger to configure it
-        Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-
-        // remove default handler to remove standard handlers
-        Logger l0 = Logger.getLogger("");
-        l0.removeHandler(l0.getHandlers()[0]);
-
-        // global logger: INFO + simple formatter to log.txt
-        logger.setLevel(Level.INFO);
-        FileHandler fileTxt = new FileHandler("log.txt");
-        SimpleFormatter formatterTxt = new SimpleFormatter();
-        fileTxt.setFormatter(formatterTxt);
-        logger.addHandler(fileTxt);
+        try {
+            Logger logger = Logger.getLogger("");
+            logger.removeHandler(logger.getHandlers()[0]);
+            logger.setLevel(Level.INFO);
+            Handler handler = new FileHandler("log.txt");
+            SimpleFormatter formatter = new SimpleFormatter();
+            handler.setFormatter(formatter);
+            logger.addHandler(handler);
+            LOGGER.info("log configured ");
+        } catch (IOException e) {
+            System.err.println("cannot configure logger: " + e.getMessage());
+            System.exit(1);
+        }
     }
 
     public void run(Controller controller) throws IOException {
-        configureLogger();
 
         for (ApplicationModule m : modules.values()) {
-            log.info("starting: " + m.getClass().getSimpleName());
+            LOGGER.info("starting: " + m.getClass().getSimpleName());
             m.start();
         }
 
-        log.info("starting keyboard loop");
+        LOGGER.info("starting keyboard loop");
         // start reading the keyboard
         Thread kb = new Thread(this::keyboardLoop);
         kb.start();
@@ -63,7 +61,7 @@ public abstract class Application {
         // run controller on main thread until it terminates
         controller.run();
 
-        log.info("waiting for keyboard loop to stop");
+        LOGGER.info("waiting for keyboard loop to stop");
         // wait for keyboard loop to stop
         run = false;
         while (true) {
@@ -76,11 +74,11 @@ public abstract class Application {
         }
 
         for (ApplicationModule m : modules.values()) {
-            log.info("stopping: " + m.getClass().getSimpleName());
+            LOGGER.info("stopping: " + m.getClass().getSimpleName());
             m.stop();
         }
 
-        log.info("run loop finished");
+        LOGGER.info("run loop finished");
     }
 
     // http://develorium.com/2016/03/unbuffered-standard-input-in-java-console-applications/
@@ -97,7 +95,7 @@ public abstract class Application {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             } catch (IOException e) {
-                log.warning("error reading keyboard: " + e.getMessage());
+                LOGGER.warning("error reading keyboard: " + e.getMessage());
             }
         }
     }

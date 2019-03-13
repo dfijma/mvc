@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 
 public class MainView extends View<AppModel> {
 
-    Logger log = Logger.getGlobal();
+    private static final Logger LOGGER = Logger.getLogger(MainView.class.getName());
 
     final Event<Void> up = new Event<>();
     final Event<Void> down = new Event<>();
@@ -36,7 +36,9 @@ public class MainView extends View<AppModel> {
                 setRC(i+1, 1);
                 System.out.print(lines.get(i).replace("\n", ""));
             }
-        } catch (IOException e) { throw new RuntimeException(e); }
+        } catch (IOException e) {
+            LOGGER.severe("cannot read screen.txt: " + e.getMessage());
+        }
     }
 
     @Override

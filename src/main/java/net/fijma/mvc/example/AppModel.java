@@ -6,7 +6,7 @@ import java.util.logging.Logger;
 
 public class AppModel {
 
-    private Logger log = Logger.getGlobal();
+    private static final Logger LOGGER = Logger.getLogger(AppModel.class.getName());
 
     final Event<Integer> onSomethingChanged = new Event<>();
 
@@ -14,13 +14,13 @@ public class AppModel {
 
     public void inc() {
         value++;
-        log.info(() -> String.format("inc: value is now: %d", value));
+        LOGGER.info(() -> String.format("inc: value is now: %d", value));
         onSomethingChanged.trigger(value);
     }
 
     public void dec() {
         value--;
-        log.info(() -> String.format("dec: value is now: %d", value));
+        LOGGER.info(() -> String.format("dec: value is now: %d", value));
         onSomethingChanged.trigger(value);
     }
 
