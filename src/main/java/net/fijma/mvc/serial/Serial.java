@@ -65,7 +65,8 @@ public class Serial implements ApplicationModule, SerialWriter, SerialPortDataLi
     @Override
     public void serialEvent(SerialPortEvent event) {
         if (event.getEventType() != SerialPort.LISTENING_EVENT_DATA_AVAILABLE) return;
-        byte[] newData = new byte[serial.bytesAvailable()];
+        int bytesAvailable = serial.bytesAvailable();
+        byte[] newData = new byte[bytesAvailable];
         int numRead = serial.readBytes(newData, newData.length);
         for (int i=0; i<numRead; ++i) {
             this.onSerialByte(newData[i]);
@@ -79,10 +80,8 @@ public class Serial implements ApplicationModule, SerialWriter, SerialPortDataLi
         // decode incoming serial bytes as ASCII (yes, no fancy UTF-8 stuff expected)
         if (b == 10) return;
         if (b == 13) {
-
             // post available serial line to msg queue
             application.offer(new SerialMsg(serialString.toString()));
-
             serialString = new StringBuilder();
             return;
         }

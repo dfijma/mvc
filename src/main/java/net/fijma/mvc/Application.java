@@ -91,7 +91,7 @@ public abstract class Application {
                     Thread.sleep(10);
                     continue;
                 }
-                msgQueue.offer(new KeyMsg(console.reader().read()));
+                offer(new KeyMsg(console.reader().read()));
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             } catch (IOException e) {
@@ -105,9 +105,14 @@ public abstract class Application {
         private KeyMsg(Integer key) { this.key = key; }
     }
 
-    Msg poll() { return msgQueue.poll(); }
+    Msg poll() {
+        return msgQueue.poll();
+    }
 
-    public void offer(Msg msg) { msgQueue.offer(msg); }
+    public void offer(Msg msg) {
+        boolean rc = msgQueue.offer(msg);
+        if (!rc) LOGGER.severe(() -> "error offering msg: " + msg);
+    }
 
 
 }
