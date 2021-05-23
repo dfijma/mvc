@@ -1,25 +1,25 @@
 package net.fijma.mvc;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Console;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.logging.*;
 
 public abstract class Application {
 
-    private static final Logger LOGGER = Logger.getLogger(Application.class.getName());
+    private static final Logger log = LoggerFactory.getLogger(Application.class);
 
     private final Map<Class<?>, ApplicationModule> modules = new HashMap<>();
 
     private volatile boolean run = true;
-    private Queue<Msg> msgQueue = new ConcurrentLinkedQueue<>();
+    private final Queue<Msg> msgQueue = new ConcurrentLinkedQueue<>();
 
-    protected Application() {
-        configureLogger();
-    }
+    protected Application() { }
 
     protected void registerModule(ApplicationModule m) {
         modules.put(m.getClass(), m);
@@ -29,31 +29,15 @@ public abstract class Application {
         return key.cast(modules.get(key));
     }
 
-    private void configureLogger() {
-        // get the global logger to configure it
-        try {
-            Logger logger = Logger.getLogger("");
-            logger.removeHandler(logger.getHandlers()[0]);
-            logger.setLevel(Level.INFO);
-            Handler handler = new FileHandler("log.txt");
-            SimpleFormatter formatter = new SimpleFormatter();
-            handler.setFormatter(formatter);
-            logger.addHandler(handler);
-            LOGGER.info("log configured ");
-        } catch (IOException e) {
-            System.err.println("cannot configure logger: " + e.getMessage());
-            System.exit(1);
-        }
-    }
 
     public void run(Controller controller) throws IOException {
 
         for (ApplicationModule m : modules.values()) {
-            LOGGER.info("starting: " + m.getClass().getSimpleName());
+            log.info("starting: {}" , m.getClass().getSimpleName());
             m.start();
         }
 
-        LOGGER.info("starting keyboard loop");
+        log.info("starting keyboard loop");
         // start reading the keyboard
         Thread kb = new Thread(this::keyboardLoop);
         kb.start();
@@ -61,7 +45,7 @@ public abstract class Application {
         // run controller on main thread until it terminates
         controller.run();
 
-        LOGGER.info("waiting for keyboard loop to stop");
+        log.info("waiting for keyboard loop to stop");
         // wait for keyboard loop to stop
         run = false;
         while (true) {
@@ -74,11 +58,11 @@ public abstract class Application {
         }
 
         for (ApplicationModule m : modules.values()) {
-            LOGGER.info("stopping: " + m.getClass().getSimpleName());
+            log.info("stopping: {}", m.getClass().getSimpleName());
             m.stop();
         }
 
-        LOGGER.info("run loop finished");
+        log.info("run loop finished");
     }
 
     // http://develorium.com/2016/03/unbuffered-standard-input-in-java-console-applications/
@@ -95,7 +79,7 @@ public abstract class Application {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             } catch (IOException e) {
-                LOGGER.warning("error reading keyboard: " + e.getMessage());
+                log.warn("error reading keyboard: {}", e.getMessage());
             }
         }
     }
@@ -111,7 +95,9 @@ public abstract class Application {
 
     public void offer(Msg msg) {
         boolean rc = msgQueue.offer(msg);
-        if (!rc) LOGGER.severe(() -> "error offering msg: " + msg);
+        if (!rc) {
+            log.error("error offering msg: {}", msg);
+        }
     }
 
 

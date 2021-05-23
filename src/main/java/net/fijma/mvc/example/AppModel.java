@@ -1,12 +1,12 @@
 package net.fijma.mvc.example;
 
 import net.fijma.mvc.Event;
-
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AppModel {
 
-    private static final Logger LOGGER = Logger.getLogger(AppModel.class.getName());
+    private static final Logger log = LoggerFactory.getLogger(AppModel.class);
 
     final Event<Integer> onSomethingChanged = new Event<>();
 
@@ -14,13 +14,13 @@ public class AppModel {
 
     public void inc() {
         value++;
-        LOGGER.info(() -> String.format("inc: value is now: %d", value));
+        log.info("inc: value is now: {}", value);
         onSomethingChanged.trigger(value);
     }
 
     public void dec() {
         value--;
-        LOGGER.info(() -> String.format("dec: value is now: %d", value));
+        log.info("dec: value is now: {}", value);
         onSomethingChanged.trigger(value);
     }
 

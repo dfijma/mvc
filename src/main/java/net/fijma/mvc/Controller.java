@@ -1,10 +1,6 @@
 package net.fijma.mvc;
 
-import java.util.logging.Logger;
-
 public abstract class Controller<A extends Application, M, V extends View> {
-
-    private static final Logger LOGGER = Logger.getLogger(Controller.class.getName());
 
     protected final M model;
     protected final V mainView;

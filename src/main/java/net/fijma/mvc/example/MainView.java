@@ -2,17 +2,18 @@ package net.fijma.mvc.example;
 
 import net.fijma.mvc.View;
 import net.fijma.mvc.Event;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class MainView extends View<AppModel> {
 
-    private static final Logger LOGGER = Logger.getLogger(MainView.class.getName());
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(AppModel.class);
 
     final Event<Void> up = new Event<>();
     final Event<Void> down = new Event<>();
@@ -31,13 +32,13 @@ public class MainView extends View<AppModel> {
     public void draw() {
         red();
         try {
-            List<String> lines = Files.readAllLines(Paths.get("screen.txt"), Charset.forName("UTF-8"));
+            List<String> lines = Files.readAllLines(Paths.get("screen.txt"), StandardCharsets.UTF_8);
             for (int i=0; i<Math.min(24, lines.size()); ++i) {
                 setRC(i+1, 1);
                 System.out.print(lines.get(i).replace("\n", ""));
             }
         } catch (IOException e) {
-            LOGGER.severe("cannot read screen.txt: " + e.getMessage());
+            log.error("cannot read screen.txt: {}", e.getMessage());
         }
     }
 

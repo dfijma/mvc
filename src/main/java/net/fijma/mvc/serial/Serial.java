@@ -6,15 +6,15 @@ import com.fazecast.jSerialComm.SerialPortEvent;
 import net.fijma.mvc.Application;
 import net.fijma.mvc.ApplicationModule;
 import net.fijma.mvc.Msg;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.logging.Logger;
+import java.nio.charset.StandardCharsets;
 
 public class Serial implements ApplicationModule, SerialWriter, SerialPortDataListener {
 
-    private static final Logger LOGGER = Logger.getLogger(Serial.class.getName());
-
+    private final Logger log = LoggerFactory.getLogger(Serial.class);
     private final String device;
     private final Application application;
     private SerialPort serial = null;
@@ -39,7 +39,7 @@ public class Serial implements ApplicationModule, SerialWriter, SerialPortDataLi
     @Override
     public void start() throws IOException {
 
-        LOGGER.info("starting serial");
+        log.info("starting serial");
         // TODO: remove hardcoded stuff
         int baudRate = 57600; // 115200; //
 
@@ -52,13 +52,14 @@ public class Serial implements ApplicationModule, SerialWriter, SerialPortDataLi
 
     @Override
     public void stop() {
-        LOGGER.info("waiting for serial to stop");
+        log.info("waiting for serial to stop");
         if (serial != null) serial.closePort();
     }
 
     // @Override
     public void write(String s) throws IOException {
-        byte[] bs = s.getBytes(Charset.forName("ASCII"));  // This is the eighties, we don't do UTF-8
+        byte[] bs = s.getBytes(StandardCharsets.UTF_8);
+        log.info("serial line sent: {}", s);
         serial.writeBytes(bs, bs.length);
     }
 
@@ -74,15 +75,17 @@ public class Serial implements ApplicationModule, SerialWriter, SerialPortDataLi
     }
 
     // keep incoming serial data and decode to string, display as msg on complete
-    private StringBuilder serialString = new StringBuilder();
+    private final StringBuilder serialString = new StringBuilder();
 
     private void onSerialByte(int b) {
         // decode incoming serial bytes as ASCII (yes, no fancy UTF-8 stuff expected)
         if (b == 10) return;
         if (b == 13) {
             // post available serial line to msg queue
-            application.offer(new SerialMsg(serialString.toString()));
-            serialString = new StringBuilder();
+            final String msg = serialString.toString();
+            log.info("serial line received: {}", msg);
+            application.offer(new SerialMsg(msg));
+            serialString.setLength(0);
             return;
         }
         serialString.append((char)b);

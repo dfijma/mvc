@@ -17,6 +17,11 @@ public abstract class View<M> {
         setRC(0,0);
     }
 
+    // https://stackoverflow.com/questions/4842424/list-of-ansi-color-escape-sequences
+    public static final int BLACK = 0;
+    public static final int RED = 1;
+    public static final int GREEN = 2;
+
     protected String green() {
         return "\u001b[32m";
     }
